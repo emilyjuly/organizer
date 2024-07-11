@@ -1,3 +1,6 @@
+# Organizer editor
+A page that clones the behavior of notion, using react and tiptap editor
+
 ## Resources
 
 - https://tiptap.dev/docs/editor/getting-started/overview
