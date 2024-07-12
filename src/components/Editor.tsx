@@ -5,11 +5,15 @@ import {
   FloatingMenu,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { InitialContent } from "./InitialContent";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
 import Underline from "@tiptap/extension-underline";
-
+import Placeholder from "@tiptap/extension-placeholder";
+import OrderedList from "@tiptap/extension-ordered-list";
+import BulletList from "@tiptap/extension-bullet-list";
+import CodeBlock from "@tiptap/extension-code-block";
+import Blockquote from "@tiptap/extension-blockquote";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
 import "highlight.js/styles/tokyo-night-dark.css";
 import {
   RxFontBold,
@@ -17,8 +21,6 @@ import {
   RxStrikethrough,
   RxCode,
   RxUnderline,
-  RxChevronDown,
-  RxChatBubble,
 } from "react-icons/rx";
 import BubbleButton from "./BubbleButton";
 
@@ -31,11 +33,18 @@ export function Editor() {
     extensions: [
       StarterKit,
       Underline,
+      BulletList,
+      OrderedList,
+      Blockquote,
+      HorizontalRule,
+      CodeBlock,
       CodeBlockLowlight.configure({
         lowlight: createLowlight(common),
       }),
+      Placeholder.configure({
+        placeholder: "Write something, or press '/ ' for commands...",
+      }),
     ],
-    content: InitialContent,
     editorProps: {
       attributes: {
         class: "outline-none",
@@ -43,7 +52,7 @@ export function Editor() {
     },
   });
 
-  const menuButtonsIcons = [
+  const menuButtons = [
     {
       icon: <RxFontBold className="h-4 w-4" />,
       style: "bold",
@@ -71,16 +80,88 @@ export function Editor() {
     },
   ];
 
+  const floatingMenuButtons = [];
+
+  if (editor) {
+    const { state, dispatch } = editor && editor.view;
+    const { from } = state.selection;
+
+    const transaction = state.tr.delete(from - 1, from);
+
+    floatingMenuButtons.push(
+      {
+        src: "https://www.notion.so/images/blocks/header.57a7576a.png",
+        name: "Heading 1",
+        text: "Big section heading.",
+        action: () => {
+          dispatch(transaction);
+          editor && editor.chain().focus().toggleHeading({ level: 2 }).run();
+        },
+      },
+      {
+        src: "https://www.notion.so/images/blocks/subheader.9aab4769.png",
+        name: "Heading 2",
+        text: "Medium section heading.",
+        action: () => {
+          dispatch(transaction);
+          editor && editor.chain().focus().toggleHeading({ level: 2 }).run();
+        },
+      },
+      {
+        src: "https://www.notion.so/images/blocks/subsubheader.d0ed0bb3.png",
+        name: "Heading 3",
+        text: "Small section heading.",
+        action: () => {
+          dispatch(transaction);
+          editor && editor.chain().focus().toggleHeading({ level: 3 }).run();
+        },
+      },
+      {
+        src: "https://www.notion.so/images/blocks/numbered-list.0406affe.png",
+        name: "Numbered list",
+        text: "Create a list with numbering.",
+        action: () => {
+          dispatch(transaction);
+          editor && editor.chain().focus().toggleOrderedList().run();
+        },
+      },
+      {
+        src: "https://www.notion.so/images/blocks/code.a8b201f4.png",
+        name: "Code",
+        text: "Capture a code snippet",
+        action: () => {
+          dispatch(transaction);
+          editor && editor.chain().focus().toggleCodeBlock().run();
+        },
+      },
+      {
+        src: "https://www.notion.so/images/blocks/quote/en-US.png",
+        name: "Quote",
+        text: "Capture a quote.",
+        action: () => {
+          dispatch(transaction);
+          editor && editor.chain().focus().toggleBlockquote().run();
+        },
+      },
+      {
+        src: "https://www.notion.so/images/blocks/divider.210d0faf.png",
+        name: "Divider",
+        text: "Visually divide blocks.",
+        action: () => {
+          dispatch(transaction);
+          editor && editor.chain().focus().setHorizontalRule().run();
+        },
+      },
+    );
+  }
+
   return (
     <>
-      <EditorContent
-        editor={editor}
-        className="prose prose-violet mx-auto pt-16"
-      />
+      <EditorContent editor={editor} className="prose prose-violet pt-16" />
 
       {editor && (
         <FloatingMenu
-          className="flex flex-col gap-y-2 overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 px-2 py-2 shadow-xl shadow-black/20"
+          className="flex max-h-[20rem] flex-col gap-y-2 overflow-hidden overflow-y-auto rounded-lg border border-zinc-100 bg-zinc-50 px-2 py-2 shadow-xl shadow-black/20"
           editor={editor}
           shouldShow={({ state }) => {
             const { $from } = state.selection;
@@ -90,73 +171,22 @@ export function Editor() {
           }}
         >
           <p className="text-xs text-zinc-400">Basic blocks</p>
-          <button className="flex min-w-[280px] items-center gap-2 rounded hover:bg-zinc-100">
-            <img
-              src="https://www.notion.so/images/blocks/text/en-US.png"
-              alt="Text"
-              className="w-10 rounded border border-zinc-300"
-            />
-            <div className="flex flex-col">
-              <span className="text-start text-sm">Text</span>
-              <span className="text-xs text-zinc-500">
-                Just start writing with plain text.
-              </span>
-            </div>
-          </button>
-          <button
-            className="flex min-w-[280px] items-center gap-2 rounded hover:bg-zinc-100"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run()
-            }
-          >
-            <img
-              src="https://www.notion.so/images/blocks/header.57a7576a.png"
-              alt="Heading 1"
-              className="w-10 rounded border border-zinc-300"
-            />
-            <div className="flex flex-col">
-              <span className="text-start text-sm">Heading 1</span>
-              <span className="text-xs text-zinc-500">
-                Big section heading.
-              </span>
-            </div>
-          </button>
-          <button
-            className="flex min-w-[280px] items-center gap-2 rounded hover:bg-zinc-100"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run()
-            }
-          >
-            <img
-              src="https://www.notion.so/images/blocks/subheader.9aab4769.png"
-              alt="Heading 2"
-              className="w-10 rounded border border-zinc-300"
-            />
-            <div className="flex flex-col">
-              <span className="text-start text-sm">Heading 2</span>
-              <span className="text-xs text-zinc-500">
-                Medium section heading.
-              </span>
-            </div>
-          </button>
-          <button
-            className="flex min-w-[280px] items-center gap-2 rounded hover:bg-zinc-100"
-            onClick={() =>
-              editor.chain().focus().toggleHeading({ level: 3 }).run()
-            }
-          >
-            <img
-              src="https://www.notion.so/images/blocks/subsubheader.d0ed0bb3.png"
-              alt="Heading 3"
-              className="w-10 rounded border border-zinc-300"
-            />
-            <div className="flex flex-col">
-              <span className="text-start text-sm">Heading 3</span>
-              <span className="text-xs text-zinc-500">
-                Small section heading.
-              </span>
-            </div>
-          </button>
+          {floatingMenuButtons.map(({ src, name, text, action }) => (
+            <button
+              className="flex min-w-[280px] items-center gap-2 rounded hover:bg-zinc-100"
+              onClick={action}
+            >
+              <img
+                src={src}
+                alt={name}
+                className="w-10 rounded border border-zinc-300"
+              />
+              <div className="flex flex-col">
+                <span className="text-start text-sm">{name}</span>
+                <span className="text-xs text-zinc-500">{text}</span>
+              </div>
+            </button>
+          ))}
         </FloatingMenu>
       )}
 
@@ -165,16 +195,8 @@ export function Editor() {
           className="flex divide-x divide-zinc-200 overflow-hidden rounded-lg border border-zinc-100 bg-zinc-50 shadow-xl shadow-black/20"
           editor={editor}
         >
-          <BubbleButton>
-            Text
-            <RxChevronDown className="h-4 w-4" />
-          </BubbleButton>
-          <BubbleButton>
-            <RxChatBubble className="h-4 w-4" />
-            Comment
-          </BubbleButton>
           <div className="flex items-center">
-            {menuButtonsIcons.map(({ icon, style, action }) => (
+            {menuButtons.map(({ icon, style, action }) => (
               <BubbleButton
                 key={style}
                 onClick={action}
