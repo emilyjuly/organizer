@@ -8,8 +8,6 @@ import StarterKit from "@tiptap/starter-kit";
 import { InitialContent } from "./InitialContent";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { common, createLowlight } from "lowlight";
-import javascript from "highlight.js/lib/languages/javascript";
-import Lowlight from "react-lowlight";
 import Underline from "@tiptap/extension-underline";
 
 import "highlight.js/styles/tokyo-night-dark.css";
@@ -24,7 +22,9 @@ import {
 } from "react-icons/rx";
 import BubbleButton from "./BubbleButton";
 
-Lowlight.registerLanguage("js", javascript);
+const lowlight = createLowlight(common);
+
+lowlight.highlight("js", '"use strict";');
 
 export function Editor() {
   const editor = useEditor({
