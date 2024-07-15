@@ -1,7 +1,7 @@
 import Divider from "@mui/material/Divider";
 import Input from "@mui/material/Input";
 import Checkbox from "@mui/material/Checkbox";
-import { googleLogout, useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
