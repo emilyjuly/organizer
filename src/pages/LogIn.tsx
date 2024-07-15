@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 interface User {
   access_token: string;
-  authuser: string;
+  authuser?: string;
   expires_in: number;
   prompt: string;
   scope: string;
@@ -49,16 +49,16 @@ const LogIn = () => {
         )
         .then((res) => {
           setProfile(res.data);
-          navigate("/");
+          if (profile) navigate("/");
         })
         .catch((err) => console.log(err));
     }
   }, [user]);
 
-  const logOut = () => {
-    googleLogout();
-    setProfile(null);
-  };
+  // const logOut = () => {
+  //   googleLogout();
+  //   setProfile(null);
+  // };
 
   return (
     <div className="flex h-screen">
